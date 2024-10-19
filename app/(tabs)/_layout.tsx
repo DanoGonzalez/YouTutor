@@ -32,6 +32,15 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="Login" // Cambia a "login" para coincidir con la ruta de tu pantalla de login
+        options={{
+          title: 'Login',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'log-in' : 'log-in-outline'} color={color} /> // Usa 'log-in' en lugar de 'login'
+          ),
+        }}
+      />
     </Tabs>
   );
 }
