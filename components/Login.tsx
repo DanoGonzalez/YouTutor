@@ -1,63 +1,60 @@
-// app/login.js
-import React, { useState } from 'react';
-import { View, TextInput, Button, Text, StyleSheet } from 'react-native';
-import { auth } from '../utils/firebase'; // Ajusta la ruta según tu estructura
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import React, { useEffect, useState } from 'react';
+import { getFirestore, collection, query, getDocs } from 'firebase/firestore';
 
-const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+// Definimos la interfaz para el usuario
+interface User {
+    id: string;
+    nombre: string;
+    email: string;
+    password: string; // Asegúrate de manejar esto de forma segura
+}
 
-  const handleLogin = async () => {
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      console.log('Inicio de sesión exitoso');
-      // Aquí puedes navegar a otra pantalla si lo deseas
-    } catch (error:any) {
-      setError(error.message);
-      console.error('Error al iniciar sesión:', error.message);
-    }
-  };
+const UsuariosComponent: React.FC = () => {
+    const [userData, setUserData] = useState<User[]>([]); // Establecer el tipo de estado como un array de User
+    const db = getFirestore(); // Obtén la instancia de Firestore
 
-  return (
-    <View style={styles.container}>
-      <Text>Inicio de Sesión</Text>
-      <TextInput
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Contraseña"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        style={styles.input}
-      />
-      <Button title="Iniciar Sesión" onPress={handleLogin} />
-      {error ? <Text style={styles.error}>{error}</Text> : null}
-    </View>
-  );
+    useEffect(() => {
+        const fetchUsers = async () => {
+            const usersCollection = collection(db, 'AC');
+            const usersQuery = query(usersCollection);
+            console.log('usersQuery type:', usersQuery.type); // Muestra solo el tipo de la consulta
+
+            const usersSnapshot = await getDocs(usersQuery);
+            if (!usersSnapshot.empty) {
+                const allUsers: User[] = []; // Especificamos el tipo como User[]
+                usersSnapshot.forEach((doc) => {
+                    const data = doc.data() as Omit<User, 'id'>; // Omitimos 'id' ya que lo añadimos manualmente
+                    allUsers.push({ // Agregar cada usuario al array
+                        id: doc.id,
+                        nombre: data.nombre,
+                        email: data.email,
+                        password: data.password,
+                    });
+                });
+                
+                setUserData(allUsers); // Establecer todos los usuarios en el estado
+            } else {
+                console.log('No hay usuarios en la colección.');
+            }
+        };
+
+        fetchUsers().catch(console.error); // Llamar a la función y manejar errores
+    }, [db]); // Ejecutar cuando se monta el componente
+
+    return (
+        <div>
+            <h1>Usuarios</h1>
+            <ul>
+                {userData.map(user => (
+                    <li key={user.id}>
+                        <strong>Nombre:</strong> {user.nombre}<br />
+                        <strong>Email:</strong> {user.email}<br />
+                        <strong>Password:</strong> {user.password}
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 16,
-  },
-  input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginBottom: 12,
-    paddingHorizontal: 8,
-  },
-  error: {
-    color: 'red',
-  },
-});
-
-export default Login;
+export default UsuariosComponent;

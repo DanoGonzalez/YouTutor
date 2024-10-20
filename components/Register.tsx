@@ -1,62 +1,52 @@
-// components/Register.js
-import React, { useState } from 'react';
-import { View, TextInput, Button, Text, StyleSheet } from 'react-native';
-import { auth } from '../utils/firebase'; // Ajusta la ruta según tu estructura
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import React, { useEffect, useState } from 'react';
+import { FlatList, View, Text, ActivityIndicator } from 'react-native';
+import { getUsuarios } from '@/controllers/usuariosController'; // Asegúrate de que la ruta sea correcta
+import { Usuario } from '@/models/usuarios'; // Asegúrate de que la ruta sea correcta
 
-const Register = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+const UsuariosList = () => {
+  const [usuarios, setUsuarios] = useState<Usuario[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleRegister = async () => {
-    try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      console.log('Registro exitoso');
-    } catch (error:any) {
-      setError(error.message);
-      console.error('Error al registrarse:', error.message);
-    }
-  };
+  useEffect(() => {
+    const fetchUsuarios = async () => {
+      try {
+        const fetchedUsuarios = await getUsuarios();
+        setUsuarios(fetchedUsuarios);
+      } catch (error) {
+        console.error('Error al obtener los usuarios:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsuarios();
+  }, []);
+
+  if (loading) {
+    return <ActivityIndicator />; // Mostrar indicador de carga mientras se obtienen los usuarios
+  }
 
   return (
-    <View style={styles.container}>
-      <Text>Registro</Text>
-      <TextInput
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Contraseña"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        style={styles.input}
-      />
-      <Button title="Registrarse" onPress={handleRegister} />
-      {error ? <Text style={styles.error}>{error}</Text> : null}
-    </View>
+    <FlatList
+      data={usuarios}
+      renderItem={({ item }) => (
+        <View>
+          <Text>{item.nombres} {item.apellidos}</Text>
+          <Text>{item.role}</Text>
+          <Text>{item.status}</Text>
+          <Text>{item.statusExam}</Text>
+          <Text>{item.tecnologias}</Text>
+          <Text>{item.materiasDominadas}</Text>
+          <Text>{item.descripcion}</Text>
+          <Text>{item.id}</Text>
+          <Text>{item.correo}</Text>
+          <Text>{item.password}</Text>
+          {/* Puedes añadir más detalles del usuario aquí */}
+        </View>
+      )}
+      keyExtractor={(item) => item.id || item.nombres} // Asegúrate de tener un identificador único
+    />
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 16,
-  },
-  input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginBottom: 12,
-    paddingHorizontal: 8,
-  },
-  error: {
-    color: 'red',
-  },
-});
-
-export default Register;
+export default UsuariosList;
