@@ -11,6 +11,7 @@ import YouTutorSplashScreen from "@/components/welcome/YouTutorSplashScreen";
 import OnboardingScreen from "@/components/welcome/onboardingScreen";
 import OnboardingScreen2 from "@/components/welcome/onboardingScreen2";
 import OnboardingScreen3 from "@/components/welcome/onboardingScreen3";
+import Login from "@/components/Login";
 
 // Mantener la pantalla de splash visible mientras cargamos los recursos
 SplashScreen.preventAutoHideAsync();
@@ -19,7 +20,7 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
   const [appIsReady, setAppIsReady] = useState(false);
   const [onboardingStep, setOnboardingStep] = useState(1);
-
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   // Cargar la fuente Roboto
   const [fontsLoaded] = useFonts({
     Roboto_400Regular,
@@ -35,7 +36,10 @@ export default function TabLayout() {
   if (!appIsReady) {
     return <YouTutorSplashScreen onReady={onReady} />;
   }
-
+ if (!isLoggedIn) {
+    // Mostrar la pantalla de login después del onboarding
+    return <Login onLogin={() => setIsLoggedIn(true)} />;
+  }
   if (onboardingStep === 1) {
     return (
       <OnboardingScreen
