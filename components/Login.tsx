@@ -1,27 +1,34 @@
-import React, { useState } from 'react';
-import { View, TextInput, Button, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import { loginUsuario } from '@/controllers/usuariosController'; // Importamos la función de login
-import { useNavigation } from '@react-navigation/native';
+import React, { useState } from "react";
+import {
+  View,
+  TextInput,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+} from "react-native";
+import { loginUsuario } from "@/controllers/usuariosController";
+import { useNavigation } from "@react-navigation/native";
 
 interface LoginProps {
-  onLogin: () => void; // Función que se ejecuta cuando el login es exitoso
+  onLogin: () => void;
 }
 
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
-  const [correo, setCorreo] = useState('');
-  const [password, setPassword] = useState('');
+  const [correo, setCorreo] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [showPassword, setShowPassword] = useState(false); // For toggling password visibility
+  const [showPassword, setShowPassword] = useState(false);
   const navigation = useNavigation();
 
   const handleLogin = async () => {
     try {
-      setError(null); // Limpiar errores anteriores
-      const usuario = await loginUsuario(correo, password); // Llamada a la función de login
-      console.log('Usuario logueado:', usuario);
+      setError(null);
+      const usuario = await loginUsuario(correo, password);
+      console.log("Usuario logueado:", usuario);
       onLogin();
     } catch (err: any) {
-      setError(err.message); // Mostrar mensaje de error
+      setError(err.message);
     }
   };
 
@@ -34,7 +41,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       <Image source={require("@/assets/icons/book.png")} style={styles.icon} />
       <Text style={styles.title}>¡Bienvenido!</Text>
       <Text style={styles.subtitle}>Inicia sesión ahora</Text>
-      
+
       <TextInput
         style={styles.input}
         placeholder="Correo electrónico"
@@ -50,21 +57,56 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
           onChangeText={setPassword}
           secureTextEntry={!showPassword}
         />
+        <TouchableOpacity
+          onPress={togglePasswordVisibility}
+          style={styles.eyeIcon}>
+          <Image
+            source={
+              showPassword
+                ? require("@/assets/icons/eye.svg")
+                : require("@/assets/icons/eye-off.png")
+            }
+            style={styles.iconPassword}
+          />
+        </TouchableOpacity>
       </View>
-      
+
       {error && <Text style={styles.errorText}>{error}</Text>}
-      
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Iniciar Sesión</Text>
+
+      <View style={styles.separator} />
+
+      <View style={styles.socialButtonsContainer}>
+        <TouchableOpacity style={styles.socialButton}>
+          <Image
+            source={require("@/assets/icons/google_icon.svg")}
+            style={styles.socialIcon}
+          />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Registrar Cuenta</Text>
+        <TouchableOpacity style={styles.socialButton}>
+          <Image
+            source={require("@/assets/icons/linkedin.png")}
+            style={styles.socialIcon}
+          />
         </TouchableOpacity>
-        <TouchableOpacity>
-          <Text style={styles.forgotPasswordText}>Olvide mi contraseña</Text>
+        <TouchableOpacity style={styles.socialButton}>
+          <Image
+            source={require("@/assets/icons/facebook.png")}
+            style={styles.socialIcon}
+          />
         </TouchableOpacity>
       </View>
+
+      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+        <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.registerButton}>
+        <Text style={styles.registerButtonText}>Registrar Cuenta</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity>
+        <Text style={styles.forgotPasswordText}>Olvidé mi contraseña</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -72,78 +114,106 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
   },
   icon: {
-    width: 100,
-    height: 100,
+    width: 80,
+    height: 80,
     marginBottom: 20,
   },
   title: {
-    fontSize: 36,
-    fontWeight: 'bold',
+    fontSize: 24,
+    fontWeight: "bold",
     color: "#000000",
-    fontFamily: "Roboto_700Bold",
-    marginBottom: 10, // Closer to subtitle
+    marginBottom: 5,
   },
   subtitle: {
-    fontSize: 18,
+    fontSize: 16,
     color: "#666666",
-    marginBottom: 30, // Separate subtitle from inputs
+    marginBottom: 30,
   },
   input: {
     height: 50,
-    backgroundColor: '#F5F5F5',
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    marginBottom: 20,
-    width: '80%',
-    borderColor: '#E0E0E0',
+    backgroundColor: "#F5F5F5",
+    borderRadius: 25,
+    paddingHorizontal: 20,
+    marginBottom: 15,
+    width: "100%",
+    borderColor: "#E0E0E0",
     borderWidth: 1,
   },
   passwordContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-    width: '80%',
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 15,
+    width: "100%",
+    backgroundColor: "#F5F5F5",
+    borderRadius: 25,
+    borderColor: "#E0E0E0",
+    borderWidth: 1,
   },
   inputPassword: {
     flex: 1,
     height: 50,
-    backgroundColor: '#F5F5F5',
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    borderColor: '#E0E0E0',
-    borderWidth: 1,
+    paddingHorizontal: 20,
+  },
+  eyeIcon: {
+    padding: 10,
   },
   iconPassword: {
     width: 24,
     height: 24,
-    marginRight: 10,
   },
   errorText: {
-    color: 'red',
+    color: "red",
+    marginBottom: 15,
+  },
+  socialButtonsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "60%",
     marginBottom: 20,
   },
-  buttonContainer: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    width: '80%',
-    alignItems: 'center',
-  },
-  button: {
-    backgroundColor: "#0078FF",
-    paddingVertical: 16,
-    borderRadius: 10,
+  socialButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: "center",
     alignItems: "center",
-    marginBottom: 10,
-    width: '100%',
+    backgroundColor: "#F5F5F5",
   },
-  buttonText: {
+  socialIcon: {
+    width: 30,
+    height: 30,
+  },
+  loginButton: {
+    backgroundColor: "#0078FF",
+    paddingVertical: 15,
+    borderRadius: 25,
+    alignItems: "center",
+    marginBottom: 15,
+    width: "100%",
+  },
+  loginButtonText: {
     color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  registerButton: {
+    backgroundColor: "#FFFFFF",
+    paddingVertical: 15,
+    borderRadius: 25,
+    alignItems: "center",
+    marginBottom: 15,
+    width: "100%",
+    borderColor: "#0078FF",
+    borderWidth: 1,
+  },
+  registerButtonText: {
+    color: "#0078FF",
     fontSize: 18,
     fontWeight: "bold",
   },
@@ -151,6 +221,12 @@ const styles = StyleSheet.create({
     color: "#0078FF",
     fontSize: 16,
     marginTop: 10,
+  },
+  separator: {
+    width: "100%",
+    height: 1,
+    backgroundColor: "#DCDCDC",
+    marginVertical: 20,
   },
 });
 

@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { View } from "react-native";
 import { useFonts, Roboto_400Regular } from "@expo-google-fonts/roboto";
 import * as SplashScreen from "expo-splash-screen";
@@ -12,17 +12,16 @@ import OnboardingScreen2 from "@/components/welcome/onboardingScreen2";
 import OnboardingScreen3 from "@/components/welcome/onboardingScreen3";
 import Login from "@/components/Login";
 
-// Mantener la pantalla de splash visible mientras cargamos los recursos
 SplashScreen.preventAutoHideAsync();
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const [appIsReady, setAppIsReady] = useState(false);
   const [showSplash, setShowSplash] = useState(true);
-  const [onboardingStep, setOnboardingStep] = useState(-1);
+  const [onboardingStep, setOnboardingStep] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [onboardingCompleted, setOnboardingCompleted] = useState(false);
 
-  // Cargar la fuente Roboto
   const [fontsLoaded] = useFonts({
     Roboto_400Regular,
   });
@@ -30,7 +29,6 @@ export default function TabLayout() {
   useEffect(() => {
     async function prepare() {
       try {
-        // Simular una carga de recursos
         await new Promise((resolve) => setTimeout(resolve, 2000));
       } catch (e) {
         console.warn(e);
@@ -44,53 +42,60 @@ export default function TabLayout() {
   useEffect(() => {
     if (appIsReady && fontsLoaded) {
       SplashScreen.hideAsync();
-      setShowSplash(false);
-      setOnboardingStep(0);
+      setTimeout(() => setShowSplash(false), 2000); // Show splash for 2 seconds
     }
   }, [appIsReady, fontsLoaded]);
+
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+    setOnboardingCompleted(true);
+  };
 
   if (!appIsReady || !fontsLoaded || showSplash) {
     return <YouTutorSplashScreen onReady={() => setAppIsReady(true)} />;
   }
 
-  if (onboardingStep === 0) {
-    return (
-      <OnboardingScreen
-        onFinish={() => {
-          setOnboardingStep(1);
-        }}
-      />
-    );
-  }
-
-  if (onboardingStep === 1) {
-    return (
-      <OnboardingScreen2
-        onFinish={() => {
-          setOnboardingStep(2);
-        }}
-        onBack={() => {
-          setOnboardingStep(0);
-        }}
-      />
-    );
-  }
-
-  if (onboardingStep === 2) {
-    return (
-      <OnboardingScreen3
-        onFinish={() => {
-          setOnboardingStep(-1);
-        }}
-        onBack={() => {
-          setOnboardingStep(1);
-        }}
-      />
-    );
+  if (!onboardingCompleted) {
+    switch (onboardingStep) {
+      case 0:
+        return (
+          <OnboardingScreen
+            onFinish={() => {
+              setOnboardingStep(1);
+            }}
+          />
+        );
+      case 1:
+        return (
+          <OnboardingScreen2
+            onFinish={() => {
+              setOnboardingStep(2);
+            }}
+            onBack={() => {
+              setOnboardingStep(0);
+            }}
+          />
+        );
+      case 2:
+        return (
+          <OnboardingScreen3
+            onFinish={() => {
+              setOnboardingCompleted(true);
+            }}
+            onBack={() => {
+              setOnboardingStep(1);
+            }}
+          />
+        );
+    }
   }
 
   if (!isLoggedIn) {
-    return <Login onLogin={() => setIsLoggedIn(true)} />;
+    return (
+      <View style={{ flex: 1 }}>
+        <Login onLogin={handleLogin} />
+      </View>
+    );
   }
 
   return (
