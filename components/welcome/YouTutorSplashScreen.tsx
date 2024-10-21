@@ -12,7 +12,7 @@ const YouTutorSplashScreen: React.FC<{ onReady: () => void }> = ({ onReady }) =>
     async function prepare() {
       try {
         // Pre-cargar fuentes, hacer llamadas a API, etc.
-        await new Promise(resolve => setTimeout(resolve, 2000)); // Simular un tiempo de carga
+        await new Promise((resolve) => setTimeout(resolve, 3000)); // Simular un tiempo de carga
       } catch (e) {
         console.warn(e);
       } finally {
