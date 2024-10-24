@@ -2,26 +2,33 @@ import React, { useState } from 'react';
 import { View, TextInput, Button, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { loginUsuario } from '@/controllers/usuariosController'; // Importamos la función de login
 import { useNavigation } from '@react-navigation/native';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 interface LoginProps {
-  onLogin: () => void; // Función que se ejecuta cuando el login es exitoso
+  onLogin: () => void;
 }
 
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [correo, setCorreo] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [showPassword, setShowPassword] = useState(false); // For toggling password visibility
+  const [showPassword, setShowPassword] = useState(false);
   const navigation = useNavigation();
 
   const handleLogin = async () => {
     try {
-      setError(null); // Limpiar errores anteriores
-      const usuario = await loginUsuario(correo, password); // Llamada a la función de login
+      setError(null);
+      const usuario = await loginUsuario(correo, password);
       console.log('Usuario logueado:', usuario);
+      console.log('Usuario logueado:', usuario);
+
+      const usuarioData = {
+        id: usuario.id,
+        nombreCompleto: `${usuario.nombres} ${usuario.apellidos}`,
+      };
+      await AsyncStorage.setItem('usuario', JSON.stringify(usuarioData));
       onLogin();
     } catch (err: any) {
-      setError(err.message); // Mostrar mensaje de error
+      setError(err.message);
     }
   };
 

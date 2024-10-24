@@ -13,6 +13,8 @@ import OnboardingScreen2 from "@/components/welcome/onboardingScreen2";
 import OnboardingScreen3 from "@/components/welcome/onboardingScreen3";
 import Login from "@/components/Login";
 
+import  { isUsuarioLogueado } from '@/controllers/usuariosController';
+
 // Mantener la pantalla de splash visible mientras cargamos los recursos
 SplashScreen.preventAutoHideAsync();
 
@@ -21,10 +23,21 @@ export default function TabLayout() {
   const [appIsReady, setAppIsReady] = useState(false);
   const [onboardingStep, setOnboardingStep] = useState(1);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(true);
   // Cargar la fuente Roboto
   const [fontsLoaded] = useFonts({
     Roboto_400Regular,
   });
+
+  useEffect(() => {
+    const checkUserLoggedIn = async () => {
+      const loggedIn = await isUsuarioLogueado();
+      setIsLoggedIn(loggedIn);
+      setLoading(false);
+    };
+
+    checkUserLoggedIn();
+  }, []);
 
   const onReady = useCallback(async () => {
     if (fontsLoaded) {
