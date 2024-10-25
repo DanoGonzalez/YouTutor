@@ -1,6 +1,6 @@
 import { Tabs } from "expo-router";
-import React, { useState, useEffect } from "react";
-import { View, Button } from "react-native";
+import React, { useState, useEffect, useCallback } from "react";
+import { View, Image } from "react-native";
 import { useFonts, Roboto_400Regular } from "@expo-google-fonts/roboto";
 import * as SplashScreen from "expo-splash-screen";
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
@@ -11,8 +11,8 @@ import OnboardingScreen from "@/components/welcome/onboardingScreen";
 import OnboardingScreen2 from "@/components/welcome/onboardingScreen2";
 import OnboardingScreen3 from "@/components/welcome/onboardingScreen3";
 import Login from "@/components/Login";
-import  { isUsuarioLogueado } from '@/controllers/usuariosController';
-import { useNavigation } from "@react-navigation/native";
+import { isUsuarioLogueado } from "@/controllers/usuariosController";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -41,7 +41,8 @@ export default function TabLayout() {
     }
     prepare();
   }, []);
-    useEffect(() => {
+
+  useEffect(() => {
     const checkUserLoggedIn = async () => {
       const loggedIn = await isUsuarioLogueado();
       setIsLoggedIn(loggedIn);
@@ -54,7 +55,7 @@ export default function TabLayout() {
   useEffect(() => {
     if (appIsReady && fontsLoaded) {
       SplashScreen.hideAsync();
-      setTimeout(() => setShowSplash(false), 2000); // Show splash for 2 seconds
+      setTimeout(() => setShowSplash(false), 2000);
     }
   }, [appIsReady, fontsLoaded]);
 
@@ -62,6 +63,16 @@ export default function TabLayout() {
     setIsLoggedIn(true);
     setOnboardingCompleted(true);
   };
+
+  const handleLogout = useCallback(async () => {
+    try {
+      await AsyncStorage.removeItem('usuario');
+      setIsLoggedIn(false);
+      setOnboardingCompleted(false);
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
+  }, []);
 
   if (!appIsReady || !fontsLoaded || showSplash) {
     return <YouTutorSplashScreen onReady={() => setAppIsReady(true)} />;
@@ -110,33 +121,71 @@ export default function TabLayout() {
     );
   }
 
+  type TabBarIconProps = {
+    focused: boolean;
+    color: string;
+  };
+
+  const TabBarIconComponent = ({ icon, color }: { icon: any; color: string }) => (
+    <Image
+      source={icon}
+      style={{
+        width: 24,
+        height: 24,
+        tintColor: color,
+      }}
+    />
+  );
+
   return (
     <View style={{ flex: 1 }}>
       <Tabs
         screenOptions={{
-          tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
           headerShown: false,
+          tabBarStyle: {
+            height: 60,
+            backgroundColor: "#0078FF",
+            borderTopWidth: 0,
+            elevation: 0,
+            shadowOpacity: 0,
+          },
+          tabBarActiveTintColor: "#272727",
+          tabBarInactiveTintColor: "#FFFFFF",
+          tabBarShowLabel: false,
         }}>
         <Tabs.Screen
-          name="index"
+          name="messages"
           options={{
-            title: "Home",
-            tabBarIcon: ({ color, focused }) => (
-              <TabBarIcon name={focused ? "home" : "home-outline"} color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="explore"
-          options={{
-            title: "Explore",
-            tabBarIcon: ({ color, focused }) => (
-              <TabBarIcon
-                name={focused ? "code-slash" : "code-slash-outline"}
+            tabBarIcon: ({ focused, color }: TabBarIconProps) => (
+              <TabBarIconComponent
+                icon={require("@/assets/icons/messageTab.svg")}
                 color={color}
               />
             ),
           }}
+        />
+        <Tabs.Screen
+          name="index"
+          options={{
+            tabBarIcon: ({ focused, color }: TabBarIconProps) => (
+              <TabBarIconComponent
+                icon={require("@/assets/icons/homeTab.svg")}
+                color={color}
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="profile"
+          options={{
+            tabBarIcon: ({ focused, color }: TabBarIconProps) => (
+              <TabBarIconComponent
+                icon={require("@/assets/icons/userTab.svg")}
+                color={color}
+              />
+            ),
+          }}
+          initialParams={{ handleLogout }}
         />
       </Tabs>
     </View>
