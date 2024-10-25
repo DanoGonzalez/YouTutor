@@ -9,6 +9,8 @@ import {
   Dimensions,
   StatusBar,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import type { NavigationProps } from "@/types/navigation";
 
 const { width } = Dimensions.get("window");
 
@@ -21,6 +23,16 @@ const OnboardingScreen3: React.FC<OnboardingScreen3Props> = ({
   onFinish,
   onBack,
 }) => {
+  const navigation = useNavigation<NavigationProps>();
+
+  const handleTeachPress = () => {
+    navigation.navigate("TutorRegistration");
+  };
+
+  const handleLearnPress = () => {
+    navigation.navigate("StudentRegistration");
+  };
+
   return (
     <>
       <StatusBar backgroundColor="#0078FF" barStyle="light-content" />
@@ -45,11 +57,12 @@ const OnboardingScreen3: React.FC<OnboardingScreen3Props> = ({
         </View>
         <View style={styles.buttonContainer}>
           <View style={styles.roleButtons}>
-            <TouchableOpacity style={styles.roleButton}>
+            <TouchableOpacity style={styles.roleButton} onPress={handleTeachPress}>
               <Text style={styles.roleButtonText}>Enseñar</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.roleButton, styles.roleButtonOutline]}>
+              style={[styles.roleButton, styles.roleButtonOutline]}
+              onPress={handleLearnPress}>
               <Text style={styles.roleButtonTextOutline}>Aprender</Text>
             </TouchableOpacity>
           </View>

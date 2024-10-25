@@ -2,7 +2,7 @@
 import { db } from '@/utils/Firebase';
 import { collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, where } from 'firebase/firestore';
 import { Usuario } from '@/models/usuarios';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const usuariosCollection = collection(db, 'usuarios');
 
 export const createUsuario = async (usuario: Usuario) => {
@@ -59,5 +59,14 @@ export const loginUsuario = async (correo: string, password: string) => {
       }
     } catch (error: any) {
       throw new Error('Error al iniciar sesión: ' + error.message);
+    }
+  };
+
+  export const isUsuarioLogueado = async () => {
+    try {
+      const usuario = await AsyncStorage.getItem('usuario');
+      return usuario !== null;
+    } catch (error: any) {
+      throw new Error('Error al verificar el estado de la sesión: ' + error.message);
     }
   };
