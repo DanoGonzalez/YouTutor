@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import type { NavigationProps } from "@/types/navigation";
-
+import { useRouter } from 'expo-router';
 const { width } = Dimensions.get("window");
 
 interface OnboardingScreen3Props {
@@ -25,12 +25,14 @@ const OnboardingScreen3: React.FC<OnboardingScreen3Props> = ({
 }) => {
   const navigation = useNavigation<NavigationProps>();
 
+  const router = useRouter();
   const handleTeachPress = () => {
-    navigation.navigate("TutorRegistration");
+    router.push('./welcome/TutorRegistration');
   };
+  
 
   const handleLearnPress = () => {
-    navigation.navigate("StudentRegistration");
+    router.push("./welcome/StudentRegistration");
   };
 
   return (
@@ -56,16 +58,17 @@ const OnboardingScreen3: React.FC<OnboardingScreen3Props> = ({
           </Text>
         </View>
         <View style={styles.buttonContainer}>
-          <View style={styles.roleButtons}>
-            <TouchableOpacity style={styles.roleButton} onPress={handleTeachPress}>
-              <Text style={styles.roleButtonText}>Enseñar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.roleButton, styles.roleButtonOutline]}
-              onPress={handleLearnPress}>
-              <Text style={styles.roleButtonTextOutline}>Aprender</Text>
-            </TouchableOpacity>
-          </View>
+        <View style={styles.roleButtons}>
+          <TouchableOpacity style={styles.roleButton} onPress={handleTeachPress}>
+            <Text style={styles.roleButtonText}>Enseñar</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.roleButton, styles.roleButtonOutline]}
+            onPress={handleLearnPress}>
+            <Text style={styles.roleButtonTextOutline}>Aprender</Text>
+          </TouchableOpacity>
+        </View>
+
           <TouchableOpacity style={styles.button} onPress={onFinish}>
             <Text style={styles.buttonText}>Siguiente</Text>
           </TouchableOpacity>

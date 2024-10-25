@@ -12,18 +12,18 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import type { NavigationProps } from "@/types/navigation";
 
-interface TutorRegistrationProps {
+interface StudentRegistrationProps {
   onBack: () => void;
   onNext: () => void;
 }
 
-const TutorRegistration: React.FC<TutorRegistrationProps> = ({
+const StudentRegistration: React.FC<StudentRegistrationProps> = ({
   onBack,
   onNext,
 }) => {
   const navigation = useNavigation<NavigationProps>();
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [confirmEmail, setConfirmEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
@@ -35,17 +35,12 @@ const TutorRegistration: React.FC<TutorRegistrationProps> = ({
     <>
       <StatusBar backgroundColor="#0078FF" barStyle="light-content" />
       <SafeAreaView style={styles.container}>
-        <TouchableOpacity style={styles.backButton} onPress={onBack}>
-          <Image
-            source={require("@/assets/icons/arrow.png")}
-            style={styles.backIcon}
-          />
-        </TouchableOpacity>
+
 
         <View style={styles.content}>
           <View style={styles.iconContainer}>
             <Image
-              source={require("@/assets/icons/signup_tutores.png")}
+              source={require("@/assets/icons/signup_estudiantes.png")}
               style={styles.icon}
               resizeMode="contain"
             />
@@ -60,17 +55,18 @@ const TutorRegistration: React.FC<TutorRegistrationProps> = ({
           <View style={styles.form}>
             <TextInput
               style={styles.input}
-              placeholder="Nombre"
-              value={name}
-              onChangeText={setName}
-              autoCapitalize="words"
+              placeholder="Correo electrónico"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
             />
 
             <TextInput
               style={styles.input}
               placeholder="Correo"
-              value={email}
-              onChangeText={setEmail}
+              value={confirmEmail}
+              onChangeText={setConfirmEmail}
               keyboardType="email-address"
               autoCapitalize="none"
             />
@@ -96,7 +92,7 @@ const TutorRegistration: React.FC<TutorRegistrationProps> = ({
             <Text style={styles.nextButtonText}>Siguiente</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.alternativeButton} onPress={handleAlternativeRegistration}>
+          <TouchableOpacity style={styles.alternativeButton}>
             <Text style={styles.alternativeButtonText}>
               Usar otro método de registro
             </Text>
@@ -181,4 +177,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TutorRegistration;
+export default StudentRegistration;
