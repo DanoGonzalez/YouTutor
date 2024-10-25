@@ -1,6 +1,6 @@
 import { Tabs } from "expo-router";
 import React, { useState, useEffect } from "react";
-import { View } from "react-native";
+import { View, Button } from "react-native";
 import { useFonts, Roboto_400Regular } from "@expo-google-fonts/roboto";
 import * as SplashScreen from "expo-splash-screen";
 import { TabBarIcon } from "@/components/navigation/TabBarIcon";
@@ -11,6 +11,8 @@ import OnboardingScreen from "@/components/welcome/onboardingScreen";
 import OnboardingScreen2 from "@/components/welcome/onboardingScreen2";
 import OnboardingScreen3 from "@/components/welcome/onboardingScreen3";
 import Login from "@/components/Login";
+import  { isUsuarioLogueado } from '@/controllers/usuariosController';
+import { useNavigation } from "@react-navigation/native";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -20,6 +22,7 @@ export default function TabLayout() {
   const [showSplash, setShowSplash] = useState(true);
   const [onboardingStep, setOnboardingStep] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [onboardingCompleted, setOnboardingCompleted] = useState(false);
 
   const [fontsLoaded] = useFonts({
@@ -37,6 +40,15 @@ export default function TabLayout() {
       }
     }
     prepare();
+  }, []);
+    useEffect(() => {
+    const checkUserLoggedIn = async () => {
+      const loggedIn = await isUsuarioLogueado();
+      setIsLoggedIn(loggedIn);
+      setLoading(false);
+    };
+
+    checkUserLoggedIn();
   }, []);
 
   useEffect(() => {
@@ -121,18 +133,6 @@ export default function TabLayout() {
             tabBarIcon: ({ color, focused }) => (
               <TabBarIcon
                 name={focused ? "code-slash" : "code-slash-outline"}
-                color={color}
-              />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="login"
-          options={{
-            title: "Login",
-            tabBarIcon: ({ color, focused }) => (
-              <TabBarIcon
-                name={focused ? "log-in" : "log-in-outline"}
                 color={color}
               />
             ),

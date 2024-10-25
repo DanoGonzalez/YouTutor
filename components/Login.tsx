@@ -1,17 +1,11 @@
 import React, { useState } from "react";
-import {
-  View,
-  TextInput,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-} from "react-native";
+import {View,TextInput,Text,StyleSheet,Image,TouchableOpacity,} from "react-native";
 import { loginUsuario } from "@/controllers/usuariosController";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface LoginProps {
-  onLogin: () => void;
+  onLogin?: () => void;
 }
 
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
@@ -26,7 +20,12 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       setError(null);
       const usuario = await loginUsuario(correo, password);
       console.log("Usuario logueado:", usuario);
-      onLogin();
+      const usuarioData = {
+        id: usuario.id,
+        nombreCompleto: `${usuario.nombres} ${usuario.apellidos}`,
+      };
+      await AsyncStorage.setItem('usuario', JSON.stringify(usuarioData));
+      onLogin && onLogin();
     } catch (err: any) {
       setError(err.message);
     }
